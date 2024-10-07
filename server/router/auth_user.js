@@ -46,3 +46,25 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
         return res.status(401).json({ message: "Invalide token" });
     }
 });
+
+// Delete a review with token verification
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const { isbn } = req.params;
+    const token = req.headers['authorization'];
+
+    if (!token) {
+        return res.status(401).json({ message: "Token is required" });
+    }
+    try {
+        const { username } = verifyToken(token);
+
+        if (!books[isbn] || !books[isbn].reviews || !books[isbn].review[username]) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        delete books[isbn].reviews[username];
+        return res.status(200).json({ message: "Review deleted successfully" });
+    } catch (err) {
+        return res.status(401).json({ message: "Invalid token" });
+    }
+});
