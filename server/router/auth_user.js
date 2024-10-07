@@ -10,6 +10,14 @@ let users = [];
 const verifyToken = (token) => jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
 
 // User registration ???
+const isValid = (username) => { // returns boolean
+    // Check if the username is valid
+    return users.some(user => user.username === username);
+}
+
+const authenticatedUser = (username, password) => { // returns boolean
+    return users.some(user => user.username === username && user.password === password);
+}
 
 // login for registered users
 regd_users.post("/login", (req, res) => {
