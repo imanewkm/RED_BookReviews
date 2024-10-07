@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 require('dotenv').config();
@@ -9,15 +10,11 @@ let users = [];
 // Helper function for token validation
 const verifyToken = (token) => jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
 
-// User registration ???
-const isValid = (username) => { // returns boolean
-    // Check if the username is valid
-    return users.some(user => user.username === username);
-}
-
-const authenticatedUser = (username, password) => { // returns boolean
-    return users.some(user => user.username === username && user.password === password);
-}
+// Use bcrypt for password hashing
+const authenticatedUser = (username, password) => {
+    const user = users.find(user => user.username === username);
+    return user && bcrypt.compareSync(password, user.password);
+};
 
 // login for registered users
 regd_users.post("/login", (req, res) => {
