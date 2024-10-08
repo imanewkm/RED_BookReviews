@@ -65,3 +65,17 @@ generalRouter.get('/books/title/:title', (req, res) => {
         res.status(404).json({ message: "No books found with this title" });
     }
 });
+
+// Get reviews for a book by ISBN
+generalRouter.get('/books/review/:isbn', (req, res) => {
+    const isbn = req.params.isbn;
+    const book = books[isbn];
+
+    if (book && book.reviews) {
+        res.status(200).json(book.reviews);
+    } else {
+        res.status(404).json({ message: "No reviews found for this book" });
+    }
+});
+
+module.exports = generalRouter;
