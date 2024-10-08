@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const generalRouter = express.Router();
-const books = require('./booksdb.js'); // Assuming books are stored in booksdb.js
+const books = require('../models/booksdb.js'); // Assuming books are stored in booksdb.js
 let users = require("./auth_users.js").users; // Get users from auth_users.js
 
 // Example route for getting books (removed duplicate definition)

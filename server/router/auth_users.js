@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-let books = require("./booksdb.js");
+let books = require("../models/booksdb.js");
 const regd_users = express.Router();
 require('dotenv').config();
 
