@@ -1,16 +1,20 @@
 const express = require('express');
-const generalRouter = express.Router();
 const bcrypt = require('bcrypt');
-let users = require("./auth_users.js").users;
-const public_users = express.Router();
+const generalRouter = express.Router();
+const books = require('./booksdb.js'); // Assuming books are stored in booksdb.js
+let users = require("./auth_users.js").users; // Get users from auth_users.js
 
-// Example route for getting books
+// Example route for getting books (removed duplicate definition)
 generalRouter.get('/books', (req, res) => {
-    // Logic for fetching books from the database or other sources
-    res.json({ message: "List of books" });
-})
+    try {
+        res.status(200).json(books); // Respond with the list of books
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching books', error: error.message });
+    }
+});
+
 // Register a new user
-public_users.post("/register", async (req, res) => {
+generalRouter.post("/register", async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -25,15 +29,6 @@ public_users.post("/register", async (req, res) => {
     users.push({ username, password: hashedPassword });
 
     return res.status(201).json({ message: "User registered successfully" });
-});
-
-// Get the list of books available
-generalRouter.get('/books', (req, res) => {
-    try {
-        res.status(200).json(books);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching books', error: error.message });
-    }
 });
 
 // Get book details by ISBN
@@ -84,6 +79,5 @@ generalRouter.get('/books/review/:isbn', (req, res) => {
     }
 });
 
-module.exports = generalRouter;
 // Export router
 module.exports = generalRouter;
