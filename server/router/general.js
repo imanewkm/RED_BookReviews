@@ -1,8 +1,14 @@
 const express = require('express');
+const generalRouter = express.Router();
 const bcrypt = require('bcrypt');
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+// Example route for getting books
+generalRouter.get('/books', (req, res) => {
+    // Logic for fetching books from the database or other sources
+    res.json({ message: "List of books" });
+})
 // Register a new user
 public_users.post("/register", async (req, res) => {
     const { username, password } = req.body;
@@ -78,4 +84,6 @@ generalRouter.get('/books/review/:isbn', (req, res) => {
     }
 });
 
+module.exports = generalRouter;
+// Export router
 module.exports = generalRouter;
