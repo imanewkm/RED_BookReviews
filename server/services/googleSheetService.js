@@ -1,4 +1,4 @@
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -34,7 +34,7 @@ const writeSheet = async (spreadsheetId, range, values) => {
 
 // Fetch all books from the google Sheets
 const getBooks = async () => {
-    const booksData = await readSheet(process.env.BOOKS_SHEET_ID, 'Sheet1!A2:F');
+    const booksData = await readSheet(process.env.BOOKS_SHEET_ID, 'booksdb!A2:F');
     return booksData.map(row => ({
         isbn: row[0],
         title: row[1],
@@ -47,7 +47,7 @@ const getBooks = async () => {
 
 // Fetch all users from the Google Sheet
 const getUsers = async () => {
-    const usersData = await readSheet(process.env.USERS_SHEET_ID, 'Sheet1!A2:D');
+    const usersData = await readSheet(process.env.USERS_SHEET_ID, 'usersdb!A2:D');
     return usersData.map(row => ({
         username: row[0],
         password: row[1], // Hashed password
@@ -61,7 +61,7 @@ const addUser = async (newUser) => {
     const { username, password, email, fullName } = newUser;
     await sheets.spreadsheets.values.append({
         spreadsheetId: process.env.USERS_SHEET_ID,
-        range: 'userdb!A2:D', // Appends the new user to the bottom of the sheet
+        range: 'usersdb!A2:D', // Appends the new user to the bottom of the sheet
         valueInputOption: 'RAW',
         resource: {
             values: [
