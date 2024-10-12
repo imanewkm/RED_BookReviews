@@ -1,13 +1,18 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const { getBooks, getUsers, addUser } = require('../services/googleSheetService');
 const generalRouter = express.Router();
-const books = require('../models/booksdb.js'); // Assuming books are stored in booksdb.js
-let users = require("./auth_users.js").users; // Get users from auth_users.js
 
-// Example route for getting books (removed duplicate definition)
-generalRouter.get('/books', (req, res) => {
+// Load users from Google Sheets
+const loadUsers = async () => {
+    return await getUsers(); // Fetch users from Google Sheets
+};
+
+// Get all books
+generalRouter.get('/books', async (req, res) => {
     try {
-        res.status(200).json(books); // Respond with the list of books
+        const books = await getBooks(); // Fetch books from Google Sheets
+        res.status(200).json(books);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching books', error: error.message });
     }
@@ -21,20 +26,25 @@ generalRouter.post("/register", async (req, res) => {
         return res.status(400).json({ message: "Username and password are required" });
     }
 
+    const users = await loadUsers(); // Fetch users from Google Sheets
+
     if (users.find(user => user.username === username)) {
         return res.status(400).json({ message: "Username already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    users.push({ username, password: hashedPassword });
+    
+    // Add the new user to Google Sheets
+    await addUser({ username, password: hashedPassword });
 
     return res.status(201).json({ message: "User registered successfully" });
 });
 
 // Get book details by ISBN
-generalRouter.get('/books/isbn/:isbn', (req, res) => {
-    const isbn = req.params.isbn;
-    const book = books[isbn];
+generalRouter.get('/books/isbn/:isbn', async (req, res) => {
+    const { isbn } = req.params;
+    const books = await getBooks(); // Fetch books from Google Sheets
+    const book = books.find(b => b.isbn === isbn);
 
     if (book) {
         res.status(200).json(book);
@@ -44,9 +54,10 @@ generalRouter.get('/books/isbn/:isbn', (req, res) => {
 });
 
 // Get book details by author
-generalRouter.get('/books/author/:author', (req, res) => {
-    const author = req.params.author;
-    const booksByAuthor = Object.values(books).filter(book => book.author === author);
+generalRouter.get('/books/author/:author', async (req, res) => {
+    const { author } = req.params;
+    const books = await getBooks(); // Fetch books from Google Sheets
+    const booksByAuthor = books.filter(book => book.author === author);
 
     if (booksByAuthor.length > 0) {
         res.status(200).json(booksByAuthor);
@@ -56,9 +67,10 @@ generalRouter.get('/books/author/:author', (req, res) => {
 });
 
 // Get book details by title
-generalRouter.get('/books/title/:title', (req, res) => {
-    const title = req.params.title;
-    const booksByTitle = Object.values(books).filter(book => book.title === title);
+generalRouter.get('/books/title/:title', async (req, res) => {
+    const { title } = req.params;
+    const books = await getBooks(); // Fetch books from Google Sheets
+    const booksByTitle = books.filter(book => book.title === title);
 
     if (booksByTitle.length > 0) {
         res.status(200).json(booksByTitle);
@@ -68,9 +80,10 @@ generalRouter.get('/books/title/:title', (req, res) => {
 });
 
 // Get reviews for a book by ISBN
-generalRouter.get('/books/review/:isbn', (req, res) => {
-    const isbn = req.params.isbn;
-    const book = books[isbn];
+generalRouter.get('/books/review/:isbn', async (req, res) => {
+    const { isbn } = req.params;
+    const books = await getBooks(); // Fetch books from Google Sheets
+    const book = books.find(b => b.isbn === isbn);
 
     if (book && book.reviews) {
         res.status(200).json(book.reviews);

@@ -1,14 +1,9 @@
-const bcrypt = require('bcrypt');
+const { getUsers } = require('../services/googleSheetService');
 
-// Local Database structure
-let users = {
-    // user
-    "User" : {
-        username: "Username",
-        password: bcrypt.hashSync("password123", 10), // Hashed password
-        email: "example@example.com"
-    }
-};
+let users = [];
 
-// Export the users "database"
+getUsers().then(data => {
+    users = data;
+}).catch(err => console.log('Error landing users:', err));
+
 module.exports = { users };
