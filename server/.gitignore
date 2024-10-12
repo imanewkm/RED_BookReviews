@@ -6,3 +6,6 @@ node_modules/
 
 # NPM package lock files
 package-lock.json
+
+#Google Cloud Service Credentials
+RED-BookReviewdb.json
